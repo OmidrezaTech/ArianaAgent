@@ -13,10 +13,12 @@ services:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/aicompany
       - SYNC_DATABASE_URL=postgresql://postgres:postgres@db:5432/aicompany
       - REDIS_URL=redis://redis:6379/0
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-mock-key}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-mock-key}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-mock-key}
+      - LLM_PROVIDER=gemini
       - ENVIRONMENT=production
       - LOG_LEVEL=INFO
+
     depends_on:
       db:
         condition: service_healthy

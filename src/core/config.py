@@ -12,17 +12,17 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "super-secret-jwt-signing-key-for-mvp-company"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day
 
-    # Database Settings (Default: SQLite for zero-config offline tests & dev; Postgres for Docker/Production)
+    # Database Settings (SQLite for local/tests, Postgres for Docker/Production)
     DATABASE_URL: str = "sqlite+aiosqlite:///./aicompany.db"
     SYNC_DATABASE_URL: str = "sqlite:///./aicompany.db"
 
-    # LLM & AI Providers (mock, openai, anthropic)
+    # LLM & AI Providers (mock, gemini, openai)
+    GEMINI_API_KEY: str = "mock-key"
     OPENAI_API_KEY: str = "mock-key"
-    ANTHROPIC_API_KEY: str = "mock-key"
-    LLM_PROVIDER: str = "mock"
-    DEFAULT_FAST_MODEL: str = "gpt-4o-mini"
-    DEFAULT_SMART_MODEL: str = "gpt-4o"
-    DEFAULT_DEV_MODEL: str = "claude-sonnet-4-5"
+    LLM_PROVIDER: str = "mock"  # mock, gemini, openai
+    DEFAULT_FAST_MODEL: str = "gemini-1.5-flash"
+    DEFAULT_SMART_MODEL: str = "gemini-1.5-pro"
+    DEFAULT_DEV_MODEL: str = "gemini-1.5-pro"
 
     # Workspace for repositories and generated code
     WORKSPACE_ROOT: str = "./workspace_repos"

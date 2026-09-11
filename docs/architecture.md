@@ -69,7 +69,8 @@ API Layer → Application Layer → Domain Layer ← Infrastructure Layer
 
 ### ۴. لایه زیرساخت (Infrastructure Layer - `src/infrastructure/`)
 - **دیتابیس (`src/infrastructure/database/`):** مدل‌های ORM با SQLAlchemy 2.0، پشتیبانی از وکتورهای ۱۵۳۶ بعدی با `pgvector` و Fallback برای SQLite.
-- **موتور هوش مصنوعی (`src/infrastructure/llm/`):** رابط انتزاعی چندپرووایدر برای اتصال به OpenAI ،Anthropic و شبیه‌ساز محلی پرسرعت.
+- **موتور هوش مصنوعی (`src/infrastructure/llm/`):** رابط انتزاعی چندپرووایدر برای اتصال به Google Gemini API (`gemini-1.5-pro` و `gemini-1.5-flash`)، OpenAI و شبیه‌ساز محلی پرسرعت.
+
 - **ابزارها (`src/infrastructure/tools/`):**
   - `FileTools`: عملیات امن فایل‌سیستم در پوشه ایزوله پروژه
   - `GitTools`: مدیریت شاخه‌ها، ایجاد کامیت و مقایسه Diff

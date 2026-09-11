@@ -1804,12 +1804,13 @@ async function submitIngestDoc(e) {
 // Agents Hub
 // -------------------------------------------------------------
 const AGENT_META = {
-  'AI COO': { avatar: '👑', color: 'rgba(99, 102, 241, 0.2)', role: 'مغز عملیاتی و ارکستراتور کل', model: 'gpt-4o' },
-  'Business Analyst': { avatar: '📋', color: 'rgba(6, 182, 212, 0.2)', role: 'تحلیل‌گر محصول و معمار مشخصات فنی', model: 'gpt-4o' },
-  'Developer': { avatar: '💻', color: 'rgba(16, 185, 129, 0.2)', role: 'مهندس توسعه نرم‌افزار و مجری کد', model: 'claude-sonnet-4-5' },
-  'QA Engineer': { avatar: '🧪', color: 'rgba(245, 158, 11, 0.2)', role: 'مهندس کیفیت، تست و اعتبارسنجی', model: 'gpt-4o' },
-  'Knowledge Manager': { avatar: '🧠', color: 'rgba(168, 85, 247, 0.2)', role: 'متولی حافظه سازمانی و RAG', model: 'gpt-4o-mini' }
+  'AI COO': { avatar: '👑', color: 'rgba(99, 102, 241, 0.2)', role: 'مغز عملیاتی و ارکستراتور کل', model: 'gemini-1.5-pro' },
+  'Business Analyst': { avatar: '📋', color: 'rgba(6, 182, 212, 0.2)', role: 'تحلیل‌گر محصول و معمار مشخصات فنی', model: 'gemini-1.5-pro' },
+  'Developer': { avatar: '💻', color: 'rgba(16, 185, 129, 0.2)', role: 'مهندس توسعه نرم‌افزار و مجری کد', model: 'gemini-1.5-pro' },
+  'QA Engineer': { avatar: '🧪', color: 'rgba(245, 158, 11, 0.2)', role: 'مهندس کیفیت، تست و اعتبارسنجی', model: 'gemini-1.5-pro' },
+  'Knowledge Manager': { avatar: '🧠', color: 'rgba(168, 85, 247, 0.2)', role: 'متولی حافظه سازمانی و RAG', model: 'gemini-1.5-flash' }
 };
+
 
 async function loadAgentsView() {
   try {

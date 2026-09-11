@@ -476,29 +476,30 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO agents (id, name, type, description, model, system_prompt, config) VALUES
 ('10000000-0000-0000-0000-000000000001', 'AI COO', 'AI_COO',
  'Operational brain that orchestrates all other agents',
- 'gpt-4o', 'You are the COO of an AI-driven company. Orchestrate workflows, decompose tasks, and manage agent assignments with maximum clarity.',
+ 'gemini-1.5-pro', 'You are the COO of an AI-driven company. Orchestrate workflows, decompose tasks, and manage agent assignments with maximum clarity.',
  '{"max_tokens": 4096, "temperature": 0.3}'::jsonb),
 
 ('10000000-0000-0000-0000-000000000002', 'Business Analyst', 'BUSINESS_ANALYST',
  'Transforms raw requests into structured specifications',
- 'gpt-4o', 'You are a senior business analyst. Transform raw product requests into actionable specifications with strict acceptance criteria and business rules.',
+ 'gemini-1.5-pro', 'You are a senior business analyst. Transform raw product requests into actionable specifications with strict acceptance criteria and business rules.',
  '{"max_tokens": 4096, "temperature": 0.2}'::jsonb),
 
 ('10000000-0000-0000-0000-000000000003', 'Developer', 'DEVELOPER',
  'Implements code based on specifications',
- 'claude-sonnet-4-5', 'You are a senior software engineer. Write clean, production-grade code following software engineering best practices.',
+ 'gemini-1.5-pro', 'You are a senior software engineer. Write clean, production-grade code following software engineering best practices.',
  '{"max_tokens": 8192, "temperature": 0.1, "tools": ["read_file","write_file","edit_file","run_tests"]}'::jsonb),
 
 ('10000000-0000-0000-0000-000000000004', 'QA Engineer', 'QA',
  'Validates implementation against requirements',
- 'gpt-4o', 'You are a QA engineer. Validate implementation against requirements, execute tests, calculate coverage, and catch edge-case bugs.',
+ 'gemini-1.5-pro', 'You are a QA engineer. Validate implementation against requirements, execute tests, calculate coverage, and catch edge-case bugs.',
  '{"max_tokens": 4096, "temperature": 0.1}'::jsonb),
 
 ('10000000-0000-0000-0000-000000000005', 'Knowledge Manager', 'KNOWLEDGE',
  'Manages Company Brain: documents, memories, decisions',
- 'gpt-4o-mini', 'You manage company knowledge, indexing documentation, surfacing patterns, and retrieving semantic context for team workflows.',
+ 'gemini-1.5-flash', 'You manage company knowledge, indexing documentation, surfacing patterns, and retrieving semantic context for team workflows.',
  '{"max_tokens": 2048, "temperature": 0.2}'::jsonb)
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET model = EXCLUDED.model;
+
 
 INSERT INTO workflows (id, name, description, version, definition) VALUES
 ('20000000-0000-0000-0000-000000000001',

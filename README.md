@@ -53,11 +53,12 @@
 
 | ردیف | نام Agent | مدل پیشنهادی | نقش و مسئولیت اصلی | ابزارهای در دسترس |
 |:---:|---|---|---|---|
-| ۱ | **AI COO** | `gpt-4o` | **مغز عملیاتی و ارکستراتور:** تجزیه درخواست‌ها، برآورد پیچیدگی و برنامه‌ریزی مراحل گردش کار | `workflow_planner`, `save_memory` |
-| ۲ | **Business Analyst** | `gpt-4o` | **تحلیل‌گر محصول و معمار نیازمندی‌ها:** تولید الزامات فنی، قوانین بیزنس و معیارهای پذیرش (Given-When-Then) | `brain_search`, `save_memory` |
-| ۳ | **Developer** | `claude-sonnet-4-5` | **مهندس توسعه کد:** تولید کدهای ماژولار، ایجاد فایل‌ها، ساخت سوییت تست خودکار و ثبت کامیت‌های Git | `read_file`, `write_file`, `edit_file`, `git_commit` |
-| ۴ | **QA Engineer** | `gpt-4o` | **مهندس تضمین کیفیت و تست:** اجرای خودکار Pytest، محاسبه درصد Coverage، تطابق با الزامات و گزارش باگ‌ها | `run_tests`, `get_coverage`, `create_bug` |
-| ۵ | **Knowledge Manager** | `gpt-4o-mini` | **مدیر حافظه و دانش سازمانی:** ایندکس‌گذاری اسناد، جستجوی برداری معنایی (RAG) و استخراج درس‌های آموخته‌شده | `embed_text`, `vector_search`, `save_memory` |
+| ۱ | **AI COO** | `gemini-1.5-pro` | **مغز عملیاتی و ارکستراتور:** تجزیه درخواست‌ها، برآورد پیچیدگی و برنامه‌ریزی مراحل گردش کار | `workflow_planner`, `save_memory` |
+| ۲ | **Business Analyst** | `gemini-1.5-pro` | **تحلیل‌گر محصول و معمار نیازمندی‌ها:** تولید الزامات فنی، قوانین بیزنس و معیارهای پذیرش (Given-When-Then) | `brain_search`, `save_memory` |
+| ۳ | **Developer** | `gemini-1.5-pro` | **مهندس توسعه کد (Google Gemini):** تولید کدهای ماژولار، ایجاد فایل‌ها، ساخت سوییت تست خودکار و ثبت کامیت‌های Git | `read_file`, `write_file`, `edit_file`, `git_commit` |
+| ۴ | **QA Engineer** | `gemini-1.5-pro` | **مهندس تضمین کیفیت و تست:** اجرای خودکار Pytest، محاسبه درصد Coverage، تطابق با الزامات و گزارش باگ‌ها | `run_tests`, `get_coverage`, `create_bug` |
+| ۵ | **Knowledge Manager** | `gemini-1.5-flash` | **مدیر حافظه و دانش سازمانی:** ایندکس‌گذاری اسناد، جستجوی برداری معنایی (RAG) و استخراج درس‌های آموخته‌شده | `embed_text`, `vector_search`, `save_memory` |
+
 
 ---
 

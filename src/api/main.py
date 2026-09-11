@@ -44,14 +44,14 @@ async def init_db_and_seed():
             )
             session.add(owner)
 
-        # 2. Seed 5 Agents
+        # 2. Seed 5 Agents (Powered by Google Gemini)
         seed_agents = [
             (
                 "10000000-0000-0000-0000-000000000001",
                 "AI COO",
                 AgentType.AI_COO,
                 "Operational brain that orchestrates all other agents",
-                "gpt-4o",
+                "gemini-1.5-pro",
                 {"max_tokens": 4096, "temperature": 0.3},
             ),
             (
@@ -59,7 +59,7 @@ async def init_db_and_seed():
                 "Business Analyst",
                 AgentType.BUSINESS_ANALYST,
                 "Transforms raw requests into structured specifications",
-                "gpt-4o",
+                "gemini-1.5-pro",
                 {"max_tokens": 4096, "temperature": 0.2},
             ),
             (
@@ -67,7 +67,7 @@ async def init_db_and_seed():
                 "Developer",
                 AgentType.DEVELOPER,
                 "Implements code based on specifications",
-                "claude-sonnet-4-5",
+                "gemini-1.5-pro",
                 {"max_tokens": 8192, "temperature": 0.1, "tools": ["read_file", "write_file", "edit_file", "run_tests"]},
             ),
             (
@@ -75,7 +75,7 @@ async def init_db_and_seed():
                 "QA Engineer",
                 AgentType.QA,
                 "Validates implementation against requirements",
-                "gpt-4o",
+                "gemini-1.5-pro",
                 {"max_tokens": 4096, "temperature": 0.1},
             ),
             (
@@ -83,10 +83,11 @@ async def init_db_and_seed():
                 "Knowledge Manager",
                 AgentType.KNOWLEDGE,
                 "Manages Company Brain: documents, memories, decisions",
-                "gpt-4o-mini",
+                "gemini-1.5-flash",
                 {"max_tokens": 2048, "temperature": 0.2},
             ),
         ]
+
 
         for ag_id, name, ag_type, desc, model, cfg in seed_agents:
             existing_agent = await session.get(Agent, ag_id)

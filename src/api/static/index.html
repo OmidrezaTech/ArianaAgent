@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Company MVP — کنترل پنل ۵ Agent هوشمند</title>
+  <style>
+    :root {
+      --bg-primary: #0a0d14;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --bg-card-hover: rgba(31, 41, 55, 0.85);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(99, 102, 241, 0.25);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #374151;
+      border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4b5563;
+    }
+
+    /* Layout */
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 20;
+    }
+
+    .brand-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--accent-cyan);
+      font-weight: 500;
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-grow: 1;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      font-weight: 500;
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-card-hover);
+      color: var(--text-main);
+    }
+
+    .nav-item.active {
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border-right: 3px solid var(--primary);
+      font-weight: 600;
+    }
+
+    .nav-badge {
+      margin-right: auto;
+      background: var(--accent-amber);
+      color: #000;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.9); }
+    }
+
+    /* Main Content */
+    .main-wrapper {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+                  radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.04) 0%, transparent 40%);
+    }
+
+    /* Top Bar */
+    .topbar {
+      height: 64px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: rgba(10, 13, 20, 0.8);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .project-selector-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .project-label {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .project-select {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+
+    .project-select:focus {
+      border-color: var(--primary);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      outline: none;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background: #059669;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #10b981;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #ef4444;
+    }
+
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    /* Page View Container */
+    .content-area {
+      padding: 28px;
+      flex-grow: 1;
+    }
+
+    .tab-view {
+      display: none;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    .tab-view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Section Header */
+    .view-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .view-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .view-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+
+    .kpi-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .kpi-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .kpi-title {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Cards & Panels */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Pipeline Step Visualizer */
+    .pipeline-wrapper {
+      padding: 20px 10px;
+      overflow-x: auto;
+    }
+
+    .pipeline-flow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 780px;
+    }
+
+    .pipeline-node {
+      flex: 1;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .pipeline-node:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .pipeline-node.completed {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.06);
+    }
+
+    .pipeline-node.active {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+      animation: pulseNode 2s infinite;
+    }
+
+    .pipeline-node.waiting {
+      border-color: var(--accent-amber);
+      background: rgba(245, 158, 11, 0.1);
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    }
+
+    @keyframes pulseNode {
+      0%, 100% { border-color: var(--primary); }
+      50% { border-color: var(--accent-cyan); }
+    }
+
+    .pipeline-node-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      font-size: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+    }
+
+    .pipeline-node.completed .pipeline-node-icon {
+      background: var(--accent-emerald);
+      color: white;
+      border-color: transparent;
+    }
+
+    .pipeline-node.waiting .pipeline-node-icon {
+      background: var(--accent-amber);
+      color: #000;
+      border-color: transparent;
+    }
+
+    .pipeline-node.active .pipeline-node-icon {
+      background: var(--primary);
+      color: white;
+      border-color: transparent;
+    }
+
+    .pipeline-node-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .pipeline-node-agent {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .pipeline-arrow {
+      color: var(--text-dim);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    .data-table th {
+      padding: 10px 14px;
+      background: rgba(31, 41, 55, 0.5);
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .data-table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-success { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .badge-warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .badge-info { background: rgba(6, 182, 212, 0.15); color: #22d3ee; }
+    .badge-primary { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+    .badge-danger { background: rgba(244, 63, 94, 0.15); color: #fb7185; }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 620px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      transform: scale(0.95);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-overlay.active .modal-box {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .modal-close:hover { color: var(--text-main); }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--primary);
+    }
+
+    .form-textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    /* Agent Cards Grid */
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .agent-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+
+    .agent-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+    }
+
+    .agent-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .agent-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .agent-name {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .agent-role {
+      font-size: 11px;
+      color: var(--accent-cyan);
+    }
+
+    .agent-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-grow: 1;
+    }
+
+    .agent-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .agent-tag {
+      font-size: 11px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      color: var(--text-dim);
+    }
+
+    /* Search Bar */
+    .search-bar-wrap {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .code-block {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #38bdf8;
+      max-height: 220px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      direction: ltr;
+      text-align: left;
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .alert-amber {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fef3c7;
+    }
+
+    /* Empty states */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-dim);
+    }
+
+    .empty-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand-header">
+      <div class="brand-icon">⚡</div>
+      <div>
+        <div class="brand-title">AI Company</div>
+        <div class="brand-sub">سیستم ارکستراسیون ۵ Agent</div>
+      </div>
+    </div>
+
+    <ul class="nav-list">
+      <li class="nav-item active" onclick="switchTab('dashboard')">
+        <span>📊</span>
+        <span>داشبورد عملیات</span>
+      </li>
+      <li class="nav-item" onclick="switchTab('workflows')">
+        <span>⚡</span>
+        <span>درخواست‌ها و پایپ‌لاین</span>
+      </li>
+      <li class="nav-item" onclick="switchTab('approvals')">
+        <span>🛑</span>
+        <span>تاییدهای انسانی</span>
+        <span class="nav-badge" id="nav-approval-badge" style="display: none;">0</span>
+      </li>
+      <li class="nav-item" onclick="switchTab('brain')">
+        <span>🧠</span>
+        <span>Company Brain & RAG</span>
+      </li>
+      <li class="nav-item" onclick="switchTab('agents')">
+        <span>🤖</span>
+        <span>وضعیت ۵ Agent</span>
+      </li>
+      <li class="nav-item" onclick="switchTab('projects')">
+        <span>📁</span>
+        <span>مدیریت پروژه‌ها</span>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <div class="status-dot"></div>
+      <span id="api-status-text">اتصال API: برقرار (v0.1.0)</span>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-wrapper">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="project-selector-wrapper">
+        <span class="project-label">پروژه فعال:</span>
+        <select id="project-select" class="project-select" onchange="onProjectChange()">
+          <option value="">در حال بارگذاری پروژه‌ها...</option>
+        </select>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="refreshCurrentView()">
+          <span>🔄</span> به‌روزرسانی
+        </button>
+        <button class="btn btn-primary btn-sm" onclick="openNewRequestModal()">
+          <span>➕</span> درخواست جدید
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="content-area">
+
+      <!-- ========================================================= -->
+      <!-- TAB 1: DASHBOARD -->
+      <!-- ========================================================= -->
+      <section id="tab-dashboard" class="tab-view active">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">داشبورد مانیتورینگ سازمان هوش مصنوعی</h1>
+            <p class="view-subtitle">دید جامع از فعالیت لحظه‌ای Agentها، درخواست‌ها، حافظه سازمانی و گیت‌های انسانی</p>
+          </div>
+          <button class="btn btn-primary" onclick="openNewRequestModal()">
+            <span>⚡</span> شروع ماموریت جدید
+          </button>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">🤖</div>
+            <div>
+              <div class="kpi-val" id="kpi-agents-count">۵</div>
+              <div class="kpi-title">Agent فعال در سیستم</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background: rgba(6, 182, 212, 0.15); color: #22d3ee;">⚡</div>
+            <div>
+              <div class="kpi-val" id="kpi-workflows-count">0</div>
+              <div class="kpi-title">اجرای Workflow</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">🛑</div>
+            <div>
+              <div class="kpi-val" id="kpi-approvals-count">0</div>
+              <div class="kpi-title">منتظر تایید انسانی</div>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">🧠</div>
+            <div>
+              <div class="kpi-val" id="kpi-memories-count">0</div>
+              <div class="kpi-title">حافظه ذخیره‌شده (Brain)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Approval Alert (if any) -->
+        <div id="dashboard-approval-alert" style="display: none;" class="alert alert-amber">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 20px;">⚠️</span>
+            <div>
+              <strong>تایید انسانی مورد نیاز است!</strong>
+              <div style="font-size: 12px; opacity: 0.9;" id="dashboard-approval-alert-text">پایپ‌لاین در گیت بررسی منتظر تصمیم شماست.</div>
+            </div>
+          </div>
+          <button class="btn btn-warning btn-sm" style="background: var(--accent-amber); color: #000;" onclick="switchTab('approvals')">
+            بررسی و اقدام ➔
+          </button>
+        </div>
+
+        <!-- Active Pipeline Status -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>🚀</span> خط لوله پردازش ۵ Agent (پروژه فعال)</div>
+            <span class="badge badge-info" id="active-workflow-badge">آماده برای اجرای ماموریت</span>
+          </div>
+
+          <div class="pipeline-wrapper">
+            <div class="pipeline-flow" id="pipeline-visualizer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Requests & Runs -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>📋</span> سابقه درخواست‌های محصول و وضعیت اجرا</div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>عنوان درخواست</th>
+                  <th>نوع</th>
+                  <th>اولویت</th>
+                  <th>وضعیت</th>
+                  <th>تسک‌ها / الزامات</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-requests-table">
+                <tr><td colspan="6" class="empty-state">در حال فراخوانی اطلاعات...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 2: WORKFLOWS & PIPELINE -->
+      <!-- ========================================================= -->
+      <section id="tab-workflows" class="tab-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">خط لوله و ارکستراسیون گردش کار</h1>
+            <p class="view-subtitle">ردیابی جزئیات اجرای هر مرحله، لاگ ابزارها، فایل‌های تولیدی و کامیت‌های Git</p>
+          </div>
+          <button class="btn btn-primary" onclick="openNewRequestModal()">
+            <span>➕</span> ثبت درخواست جدید
+          </button>
+        </div>
+
+        <!-- Selected Run Timeline Panel -->
+        <div class="panel" id="workflow-run-detail-panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span>🔍</span> جزئیات اجرای فرآیند: <span id="wf-detail-title" style="color: var(--accent-cyan);">-</span>
+            </div>
+            <div id="wf-detail-status-badge"></div>
+          </div>
+
+          <div class="pipeline-wrapper">
+            <div class="pipeline-flow" id="tab-pipeline-visualizer">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div id="agent-steps-timeline" style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+            <!-- Rendered Steps -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 3: HUMAN APPROVALS -->
+      <!-- ========================================================= -->
+      <section id="tab-approvals" class="tab-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">مرکز تصمیم‌گیری و تاییدهای انسانی (Human-in-the-Loop)</h1>
+            <p class="view-subtitle">کنترل گیت‌های بحرانی (مشخصات فنی و تایید انتشار نهایی) توسط تیم مدیریت</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>🛑</span> موارد منتظر تایید شما</div>
+          </div>
+          <div id="approvals-list-container">
+            <div class="empty-state">در حال بارگذاری...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 4: COMPANY BRAIN & RAG -->
+      <!-- ========================================================= -->
+      <section id="tab-brain" class="tab-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">Company Brain — حافظه سازمانی و RAG</h1>
+            <p class="view-subtitle">جستجوی برداری معنایی (pgvector)، استانداردهای کدنویسی، ثبت تصمیمات معماری (ADR) و حافظه Agentها</p>
+          </div>
+          <button class="btn btn-primary" onclick="openIngestModal()">
+            <span>📥</span> تزریق سند دانش جدید
+          </button>
+        </div>
+
+        <!-- Semantic Search Box -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>🔎</span> جستجوی معنایی و تشابه وکتوری (Semantic Vector Search)</div>
+          </div>
+          <div class="search-bar-wrap">
+            <input type="text" id="brain-search-input" class="form-input" placeholder="عبارت یا سوال مورد نظر را بنویسید (مثال: استانداردهای احراز هویت، اعتبارسنجی ورودی‌ها...)" onkeydown="if(event.key==='Enter') searchBrain()">
+            <button class="btn btn-primary" onclick="searchBrain()">جستجو در Brain</button>
+          </div>
+          <div id="brain-search-results"></div>
+        </div>
+
+        <!-- Memories & Decisions Split -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span>🧠</span> حافظه درس‌های آموخته‌شده (Agent Memories)</div>
+            </div>
+            <div id="memories-container" style="display: flex; flex-direction: column; gap: 10px;">
+              <div class="empty-state">در حال دریافت حافظه‌ها...</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span>⚖️</span> تصمیمات کلیدی ثبت‌شده (Decisions & ADRs)</div>
+            </div>
+            <div id="decisions-container" style="display: flex; flex-direction: column; gap: 10px;">
+              <div class="empty-state">تصمیمی ثبت نشده است.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 5: AGENTS HUB -->
+      <!-- ========================================================= -->
+      <section id="tab-agents" class="tab-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">شناسنامه و وضعیت ۵ Agent تخصصی</h1>
+            <p class="view-subtitle">پیکربندی هوش مصنوعی، مدل‌های فعال، ابزارها و سیستم‌پرامپت هر یک از اعضای تیم</p>
+          </div>
+        </div>
+
+        <div class="agent-grid" id="agents-hub-container">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+      <!-- ========================================================= -->
+      <!-- TAB 6: PROJECTS -->
+      <!-- ========================================================= -->
+      <section id="tab-projects" class="tab-view">
+        <div class="view-header">
+          <div>
+            <h1 class="view-title">پروژه‌های نرم‌افزاری</h1>
+            <p class="view-subtitle">مدیریت مخازن Git، تک‌استک و دسترسی‌های تیمی</p>
+          </div>
+          <button class="btn btn-primary" onclick="openNewProjectModal()">
+            <span>➕</span> ایجاد پروژه جدید
+          </button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>📁</span> لیست پروژه‌ها</div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>نام پروژه</th>
+                  <th>توضیحات</th>
+                  <th>Tech Stack</th>
+                  <th>وضعیت</th>
+                  <th>مخزن محلی</th>
+                  <th>تاریخ ایجاد</th>
+                </tr>
+              </thead>
+              <tbody id="projects-table-body">
+                <tr><td colspan="6" class="empty-state">در حال بارگذاری...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODALS -->
+<!-- ========================================================= -->
+
+<!-- 1. New Request Modal -->
+<div class="modal-overlay" id="modal-new-request">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">ثبت درخواست محصول جدید</h3>
+      <button class="modal-close" onclick="closeModal('modal-new-request')">&times;</button>
+    </div>
+    <form onsubmit="submitNewRequest(event)">
+      <div class="form-group">
+        <label class="form-label">عنوان درخواست / تسک:</label>
+        <input type="text" id="req-title" class="form-input" placeholder="مثال: پیاده‌سازی سرویس احراز هویت با JWT" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">توضیحات تکمیلی و مشخصات اولیه:</label>
+        <textarea id="req-desc" class="form-textarea" placeholder="شرح نیازها، پیش‌نیازها و اهداف..." required></textarea>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label class="form-label">نوع درخواست:</label>
+          <select id="req-type" class="form-select">
+            <option value="FEATURE">ویژگی جدید (FEATURE)</option>
+            <option value="BUG">رفع خطا و باگ (BUG)</option>
+            <option value="CHANGE">تغییر معماری (CHANGE)</option>
+            <option value="DOCUMENTATION">مستندات (DOCUMENTATION)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">اولویت (۱ تا ۵):</label>
+          <select id="req-priority" class="form-select">
+            <option value="5">۵ - بحرانی / بالاترین</option>
+            <option value="4" selected>۴ - اولویت بالا</option>
+            <option value="3">۳ - متوسط</option>
+            <option value="2">۲ - کم</option>
+            <option value="1">۱ - پایین‌ترین</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+        <input type="checkbox" id="req-auto-start" checked>
+        <label for="req-auto-start" style="font-size: 13px; cursor: pointer;">شروع خودکار Workflow پس از ثبت درخواست</label>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-new-request')">انصراف</button>
+        <button type="submit" class="btn btn-primary">ثبت و ارسال به AI COO ➔</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 2. Human Approval Modal -->
+<div class="modal-overlay" id="modal-approval-action">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title" id="approval-modal-title">بررسی و تصمیم‌گیری گیت تایید انسانی</h3>
+      <button class="modal-close" onclick="closeModal('modal-approval-action')">&times;</button>
+    </div>
+    <div id="approval-modal-content">
+      <!-- Dynamic Approval Info -->
+    </div>
+    <div class="form-group" style="margin-top: 16px;">
+      <label class="form-label">نظر / بازخورد اختیاری (Comment):</label>
+      <textarea id="approval-comment" class="form-textarea" placeholder="مثال: مشخصات تایید شد، لطفاً تست‌های مربوط به اعتبارسنجی را هم اضافه کنید..."></textarea>
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+      <button type="button" class="btn btn-danger" onclick="submitApprovalDecision('REJECTED')">
+        <span>❌</span> رد و توقف فرآیند (Reject)
+      </button>
+      <div style="display: flex; gap: 10px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-approval-action')">انصراف</button>
+        <button type="button" class="btn btn-success" onclick="submitApprovalDecision('APPROVED')">
+          <span>✅</span> تایید و ادامه خط لوله (Approve)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. New Project Modal -->
+<div class="modal-overlay" id="modal-new-project">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">ایجاد پروژه نرم‌افزاری جدید</h3>
+      <button class="modal-close" onclick="closeModal('modal-new-project')">&times;</button>
+    </div>
+    <form onsubmit="submitNewProject(event)">
+      <div class="form-group">
+        <label class="form-label">نام پروژه:</label>
+        <input type="text" id="proj-name" class="form-input" placeholder="مثال: Billing & Invoicing Service" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">توضیحات پروژه:</label>
+        <textarea id="proj-desc" class="form-textarea" placeholder="اهداف و دامنه پروژه..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">تک‌استک (جداشده با کاما):</label>
+        <input type="text" id="proj-tech" class="form-input" placeholder="FastAPI, PostgreSQL, Docker, Pytest" value="FastAPI, PostgreSQL, Pytest, Docker">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-new-project')">انصراف</button>
+        <button type="submit" class="btn btn-primary">ایجاد پروژه و مخزن Git</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 4. Ingest Knowledge Modal -->
+<div class="modal-overlay" id="modal-ingest-doc">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 class="modal-title">تزریق دانش و استاندارد به Company Brain</h3>
+      <button class="modal-close" onclick="closeModal('modal-ingest-doc')">&times;</button>
+    </div>
+    <form onsubmit="submitIngestDoc(event)">
+      <div class="form-group">
+        <label class="form-label">عنوان سند:</label>
+        <input type="text" id="doc-title" class="form-input" placeholder="مثال: قوانین امنیت داده و اعتبارسنجی Pydantic" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">نوع سند:</label>
+        <select id="doc-type" class="form-select">
+          <option value="CODING_STANDARD">استاندارد کدنویسی (CODING_STANDARD)</option>
+          <option value="SECURITY_RULE">قوانین امنیتی (SECURITY_RULE)</option>
+          <option value="ARCHITECTURE">معماری سیستم (ARCHITECTURE)</option>
+          <option value="COMPANY_RULE">قوانین سازمانی (COMPANY_RULE)</option>
+          <option value="SOP">دستورالعمل اجرایی (SOP)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">محتوای متنی سند:</label>
+        <textarea id="doc-content" class="form-textarea" style="min-height: 140px;" placeholder="دستورالعمل‌ها و قواعدی که Agentها باید رعایت کنند..." required></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-ingest-doc')">انصراف</button>
+        <button type="submit" class="btn btn-primary">ایندکس و تولید وکتور امبدینگ ➔</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 5. Step Detail Modal -->
+<div class="modal-overlay" id="modal-step-detail">
+  <div class="modal-box" style="max-width: 720px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="step-modal-title">جزئیات اجرای مرحله</h3>
+      <button class="modal-close" onclick="closeModal('modal-step-detail')">&times;</button>
+    </div>
+    <div id="step-modal-content"></div>
+  </div>
+</div>
+
+<script>
+// State Store
+const state = {
+  projects: [],
+  currentProjectId: null,
+  activeTab: 'dashboard',
+  currentWorkflowRun: null,
+  pendingApprovals: [],
+  selectedApprovalId: null,
+  pollTimer: null,
+};
+
+const API_BASE = '/api';
+
+// Initialize
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadProjects();
+  await refreshCurrentView();
+  startPolling();
+});
+
+function startPolling() {
+  if (state.pollTimer) clearInterval(state.pollTimer);
+  state.pollTimer = setInterval(async () => {
+    if (state.activeTab === 'dashboard' || state.activeTab === 'workflows' || state.activeTab === 'approvals') {
+      await loadPendingApprovals();
+      if (state.currentWorkflowRun && state.currentWorkflowRun.status === 'IN_PROGRESS') {
+        await loadWorkflowRunDetails(state.currentWorkflowRun.id);
+      }
+    }
+  }, 4000);
+}
+
+// Navigation
+function switchTab(tabId) {
+  state.activeTab = tabId;
+  document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+  const targetTab = document.getElementById(`tab-${tabId}`);
+  if (targetTab) targetTab.classList.add('active');
+
+  // Highlight nav
+  const navIdx = ['dashboard', 'workflows', 'approvals', 'brain', 'agents', 'projects'].indexOf(tabId);
+  const navItems = document.querySelectorAll('.nav-item');
+  if (navItems[navIdx]) navItems[navIdx].classList.add('active');
+
+  refreshCurrentView();
+}
+
+async function refreshCurrentView() {
+  if (state.activeTab === 'dashboard') await loadDashboard();
+  else if (state.activeTab === 'workflows') await loadWorkflowsView();
+  else if (state.activeTab === 'approvals') await loadPendingApprovals();
+  else if (state.activeTab === 'brain') await loadBrainView();
+  else if (state.activeTab === 'agents') await loadAgentsView();
+  else if (state.activeTab === 'projects') await loadProjectsTable();
+}
+
+// -------------------------------------------------------------
+// Projects Logic
+// -------------------------------------------------------------
+async function loadProjects() {
+  try {
+    const res = await fetch(`${API_BASE}/projects`);
+    if (res.ok) {
+      state.projects = await res.json();
+      const select = document.getElementById('project-select');
+      select.innerHTML = '';
+      if (state.projects.length === 0) {
+        select.innerHTML = '<option value="">پروژه‌ای یافت نشد</option>';
+        return;
+      }
+      state.projects.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `${p.name} (${p.tech_stack.join(', ') || 'General'})`;
+        select.appendChild(opt);
+      });
+
+      if (!state.currentProjectId || !state.projects.find(p => p.id === state.currentProjectId)) {
+        state.currentProjectId = state.projects[0].id;
+      }
+      select.value = state.currentProjectId;
+    }
+  } catch (err) {
+    console.error('Failed to load projects:', err);
+  }
+}
+
+function onProjectChange() {
+  state.currentProjectId = document.getElementById('project-select').value;
+  refreshCurrentView();
+}
+
+async function loadProjectsTable() {
+  await loadProjects();
+  const tbody = document.getElementById('projects-table-body');
+  if (!state.projects.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state">هیچ پروژه‌ای ایجاد نشده است.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = state.projects.map(p => `
+    <tr>
+      <td style="font-weight: 700;">${escapeHtml(p.name)}</td>
+      <td style="color: var(--text-muted); font-size: 12px;">${escapeHtml(p.description || '-')}</td>
+      <td>${(p.tech_stack || []).map(t => `<span class="badge badge-info">${escapeHtml(t)}</span>`).join(' ')}</td>
+      <td><span class="badge badge-success">${p.status}</span></td>
+      <td style="font-family: monospace; font-size: 11px; direction: ltr; text-align: left;">${escapeHtml(p.repository?.local_path || '-')}</td>
+      <td style="font-size: 12px; color: var(--text-dim);">${new Date(p.created_at).toLocaleDateString('fa-IR')}</td>
+    </tr>
+  `).join('');
+}
+
+async function submitNewProject(e) {
+  e.preventDefault();
+  const name = document.getElementById('proj-name').value;
+  const description = document.getElementById('proj-desc').value;
+  const techStr = document.getElementById('proj-tech').value;
+  const tech_stack = techStr.split(',').map(s => s.trim()).filter(Boolean);
+
+  try {
+    const res = await fetch(`${API_BASE}/projects`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, description, tech_stack })
+    });
+    if (res.ok) {
+      const newProj = await res.json();
+      closeModal('modal-new-project');
+      await loadProjects();
+      state.currentProjectId = newProj.id;
+      document.getElementById('project-select').value = newProj.id;
+      refreshCurrentView();
+    }
+  } catch (err) {
+    alert('خطا در ایجاد پروژه: ' + err.message);
+  }
+}
+
+// -------------------------------------------------------------
+// Dashboard & Pipeline Visualizer Logic
+// -------------------------------------------------------------
+const PIPELINE_STEPS = [
+  { name: 'ANALYSIS', label: 'تحلیل نیازمندی‌ها', agent: 'Business Analyst', icon: '📝' },
+  { name: 'REQUIREMENT_APPROVAL', label: 'گیت تایید مشخصات', agent: 'Human Approval', icon: '🛑' },
+  { name: 'DEVELOPMENT', label: 'پیاده‌سازی کد', agent: 'AI Developer', icon: '💻' },
+  { name: 'QA', label: 'تست و اعتبارسنجی', agent: 'QA Engineer', icon: '🧪' },
+  { name: 'FINAL_APPROVAL', label: 'تایید نهایی انتشار', agent: 'Human Approval', icon: '🚀' },
+  { name: 'KNOWLEDGE_CURATION', label: 'ثبت در حافظه Brain', agent: 'Knowledge Mgr', icon: '🧠' }
+];
+
+async function loadDashboard() {
+  if (!state.currentProjectId) return;
+
+  try {
+    // 1. Fetch project requests
+    const reqRes = await fetch(`${API_BASE}/requests/project/${state.currentProjectId}`);
+    const requests = reqRes.ok ? await reqRes.json() : [];
+
+    // 2. Fetch pending approvals
+    await loadPendingApprovals();
+
+    // 3. Fetch Brain Memories
+    const memRes = await fetch(`${API_BASE}/brain/memories?project_id=${state.currentProjectId}`);
+    const memories = memRes.ok ? await memRes.json() : [];
+
+    // Update KPI counters
+    document.getElementById('kpi-workflows-count').textContent = requests.length;
+    document.getElementById('kpi-memories-count').textContent = memories.length;
+
+    // Render Requests Table
+    const tbody = document.getElementById('dashboard-requests-table');
+    if (!requests.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-icon">📂</div>هنوز درخواستی برای این پروژه ثبت نشده است. دکمه «درخواست جدید» را بزنید.</td></tr>';
+      renderPipelineFlow(null);
+      return;
+    }
+
+    tbody.innerHTML = requests.map(r => {
+      const statusBadge = getStatusBadge(r.status);
+      const prioBadge = `<span class="badge badge-warning">P${r.priority}</span>`;
+      return `
+        <tr>
+          <td style="font-weight: 700;">${escapeHtml(r.title)}</td>
+          <td><span class="badge badge-primary">${r.request_type}</span></td>
+          <td>${prioBadge}</td>
+          <td>${statusBadge}</td>
+          <td style="font-size: 12px; color: var(--text-muted);">${r.requirements.length} الزام | ${r.tasks.length} تسک</td>
+          <td>
+            <button class="btn btn-secondary btn-sm" onclick="inspectRequestWorkflow('${r.id}')">
+              <span>⚡</span> مشاهده پایپ‌لاین
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Select the first request to render pipeline if none chosen
+    if (requests.length > 0) {
+      inspectRequestWorkflow(requests[0].id);
+    }
+  } catch (err) {
+    console.error('Error loading dashboard:', err);
+  }
+}
+
+async function inspectRequestWorkflow(requestId) {
+  try {
+    const res = await fetch(`${API_BASE}/workflows/runs/request/${requestId}`);
+    if (res.ok) {
+      const runs = await res.json();
+      if (runs.length > 0) {
+        state.currentWorkflowRun = runs[0];
+        renderPipelineFlow(state.currentWorkflowRun);
+        renderWorkflowDetails(state.currentWorkflowRun);
+      } else {
+        renderPipelineFlow(null);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to inspect workflow run:', err);
+  }
+}
+
+function renderPipelineFlow(run) {
+  const container = document.getElementById('pipeline-visualizer');
+  const tabContainer = document.getElementById('tab-pipeline-visualizer');
+  const badge = document.getElementById('active-workflow-badge');
+
+  if (!run) {
+    const emptyHtml = '<div class="empty-state" style="padding: 10px;">درخواستی انتخاب نشده است.</div>';
+    if (container) container.innerHTML = emptyHtml;
+    if (tabContainer) tabContainer.innerHTML = emptyHtml;
+    if (badge) {
+      badge.textContent = 'آماده برای ماموریت جدید';
+      badge.className = 'badge badge-info';
+    }
+    return;
+  }
+
+  if (badge) {
+    badge.textContent = `وضعیت: ${run.status} | مرحله: ${run.current_step || 'آغاز'}`;
+    badge.className = run.status === 'COMPLETED' ? 'badge badge-success' : run.status === 'WAITING_APPROVAL' ? 'badge badge-warning' : 'badge badge-primary';
+  }
+
+  const currentStepName = run.current_step;
+  const currentStepIdx = PIPELINE_STEPS.findIndex(s => s.name === currentStepName);
+  const isCompleted = run.status === 'COMPLETED';
+
+  const html = PIPELINE_STEPS.map((step, idx) => {
+    let nodeClass = 'pipeline-node';
+    let statusText = 'در انتظار';
+
+    if (isCompleted || (currentStepIdx > idx)) {
+      nodeClass += ' completed';
+      statusText = '✓ تکمیل شد';
+    } else if (currentStepIdx === idx) {
+      if (run.status === 'WAITING_APPROVAL') {
+        nodeClass += ' waiting';
+        statusText = '🛑 منتظر تایید انسان';
+      } else {
+        nodeClass += ' active';
+        statusText = '⚡ در حال پردازش';
+      }
+    }
+
+    const arrow = idx < PIPELINE_STEPS.length - 1 ? '<div class="pipeline-arrow">➔</div>' : '';
+
+    return `
+      <div class="${nodeClass}" onclick="openStepDetail('${step.name}')">
+        <div class="pipeline-node-icon">${step.icon}</div>
+        <div class="pipeline-node-title">${step.label}</div>
+        <div class="pipeline-node-agent">${step.agent}</div>
+        <div style="font-size: 10px; margin-top: 4px; font-weight: 600;">${statusText}</div>
+      </div>
+      ${arrow}
+    `;
+  }).join('');
+
+  if (container) container.innerHTML = html;
+  if (tabContainer) tabContainer.innerHTML = html;
+}
+
+function renderWorkflowDetails(run) {
+  const titleEl = document.getElementById('wf-detail-title');
+  const badgeEl = document.getElementById('wf-detail-status-badge');
+  const timelineEl = document.getElementById('agent-steps-timeline');
+
+  if (titleEl) titleEl.textContent = `اجرای شناسه ${run.id.substring(0, 8)}...`;
+  if (badgeEl) badgeEl.innerHTML = getStatusBadge(run.status);
+
+  if (!timelineEl) return;
+
+  if (!run.agent_runs || !run.agent_runs.length) {
+    timelineEl.innerHTML = '<div class="empty-state">مرحله‌ای هنوز ثبت نشده است.</div>';
+    return;
+  }
+
+  timelineEl.innerHTML = run.agent_runs.map((ar, i) => {
+    const costStr = `$${(ar.cost || 0).toFixed(4)}`;
+    const tokens = ar.total_tokens || 0;
+    const toolsCount = ar.tool_executions ? ar.tool_executions.length : 0;
+
+    return `
+      <div class="panel" style="background: rgba(31, 41, 55, 0.4); margin-bottom: 0;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 18px;">🤖</span>
+            <strong style="font-size: 14px; color: var(--text-main);">گام ${i+1}: اجرای Agent (${ar.model})</strong>
+            <span class="badge badge-success">${ar.status}</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); display: flex; gap: 12px;">
+            <span>🪙 توکن مصرفی: <strong>${tokens}</strong></span>
+            <span>💵 هزینه: <strong>${costStr}</strong></span>
+            <span>🔧 ابزارهای استفاده‌شده: <strong>${toolsCount}</strong></span>
+          </div>
+        </div>
+
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+          خروجی خلاصه Agent:
+        </div>
+        <div class="code-block">${escapeHtml(JSON.stringify(ar.output, null, 2))}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadWorkflowsView() {
+  if (state.currentWorkflowRun) {
+    await loadWorkflowRunDetails(state.currentWorkflowRun.id);
+  } else if (state.currentProjectId) {
+    await loadDashboard();
+  }
+}
+
+async function loadWorkflowRunDetails(runId) {
+  try {
+    const res = await fetch(`${API_BASE}/workflows/runs/${runId}`);
+    if (res.ok) {
+      state.currentWorkflowRun = await res.json();
+      renderPipelineFlow(state.currentWorkflowRun);
+      renderWorkflowDetails(state.currentWorkflowRun);
+    }
+  } catch (err) {
+    console.error('Failed to load run detail:', err);
+  }
+}
+
+// -------------------------------------------------------------
+// Human Approvals Center
+// -------------------------------------------------------------
+async function loadPendingApprovals() {
+  try {
+    const res = await fetch(`${API_BASE}/approvals/pending`);
+    if (res.ok) {
+      state.pendingApprovals = await res.json();
+      
+      // Update badge
+      const count = state.pendingApprovals.length;
+      document.getElementById('kpi-approvals-count').textContent = count;
+      const navBadge = document.getElementById('nav-approval-badge');
+      if (count > 0) {
+        navBadge.textContent = count;
+        navBadge.style.display = 'inline-block';
+        document.getElementById('dashboard-approval-alert').style.display = 'flex';
+        document.getElementById('dashboard-approval-alert-text').textContent = `تعداد ${count} درخواست در انتظار تایید انسانی و بازبینی شماست.`;
+      } else {
+        navBadge.style.display = 'none';
+        document.getElementById('dashboard-approval-alert').style.display = 'none';
+      }
+
+      // Render Approvals List
+      const container = document.getElementById('approvals-list-container');
+      if (!container) return;
+
+      if (!count) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>هیچ تاییدیه معلقی وجود ندارد. تمام گیت‌ها تایید شده‌اند.</div>';
+        return;
+      }
+
+      container.innerHTML = state.pendingApprovals.map(appr => `
+        <div class="panel" style="border-right: 4px solid var(--accent-amber); background: rgba(245, 158, 11, 0.05); margin-bottom: 14px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge badge-warning">${appr.type}</span>
+                <strong style="font-size: 15px;">گیت تایید اجرای فرآیند</strong>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">
+                شناسه Workflow: <code style="color: #38bdf8;">${appr.workflow_run_id}</code> | تاریخ ایجاد: ${new Date(appr.created_at).toLocaleTimeString('fa-IR')}
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="openApprovalModal('${appr.id}', '${appr.type}')">
+              <span>🔍</span> بررسی و تصمیم‌گیری ➔
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    console.error('Failed to load pending approvals:', err);
+  }
+}
+
+function openApprovalModal(approvalId, type) {
+  state.selectedApprovalId = approvalId;
+  document.getElementById('approval-modal-title').textContent = `بررسی گیت تایید: ${type}`;
+  document.getElementById('approval-modal-content').innerHTML = `
+    <div style="background: var(--bg-primary); padding: 14px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.8;">
+      <p style="color: var(--text-main); margin-bottom: 6px;"><strong>خلاصه وضعیت:</strong></p>
+      <p style="color: var(--text-muted);">Agentهای هوش مصنوعی خروجی‌های مرحله را تکمیل کرده و برای ورود به گام بعدی نیازمند تایید رسمی شما هستند.</p>
+      <div style="margin-top: 10px; color: var(--accent-cyan);">• نوع تاییدیه: ${type}</div>
+    </div>
+  `;
+  document.getElementById('approval-comment').value = '';
+  openModal('modal-approval-action');
+}
+
+async function submitApprovalDecision(decision) {
+  if (!state.selectedApprovalId) return;
+  const comment = document.getElementById('approval-comment').value;
+
+  try {
+    const res = await fetch(`${API_BASE}/approvals/${state.selectedApprovalId}/action`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: decision, comment })
+    });
+    if (res.ok) {
+      closeModal('modal-approval-action');
+      await loadPendingApprovals();
+      await refreshCurrentView();
+      alert(`تصمیم شما (${decision === 'APPROVED' ? 'تایید شد' : 'رد شد'}) با موفقیت ثبت شد و فرآیند ادامه یافت.`);
+    }
+  } catch (err) {
+    alert('خطا در ثبت تصمیم تاییدیه: ' + err.message);
+  }
+}
+
+// -------------------------------------------------------------
+// Company Brain (RAG & Memory)
+// -------------------------------------------------------------
+async function loadBrainView() {
+  if (!state.currentProjectId) return;
+  try {
+    // 1. Load memories
+    const memRes = await fetch(`${API_BASE}/brain/memories?project_id=${state.currentProjectId}`);
+    const memories = memRes.ok ? await memRes.json() : [];
+    const memContainer = document.getElementById('memories-container');
+    if (!memories.length) {
+      memContainer.innerHTML = '<div class="empty-state">هنوز حافظه‌ای ذخیره نشده است. با اجرای اولین Workflow درس‌های آموخته‌شده Agentها ثبت می‌شوند.</div>';
+    } else {
+      memContainer.innerHTML = memories.map(m => `
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <span class="badge badge-info">${m.memory_type}</span>
+            <span style="font-size: 11px; color: var(--accent-amber);">اهمیت: ${m.importance}/10 ★</span>
+          </div>
+          <div style="font-size: 13px; color: var(--text-main);">${escapeHtml(m.content)}</div>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    console.error('Failed to load brain view:', err);
+  }
+}
+
+async function searchBrain() {
+  const query = document.getElementById('brain-search-input').value.trim();
+  if (!query) return;
+
+  const resultsDiv = document.getElementById('brain-search-results');
+  resultsDiv.innerHTML = '<div style="font-size: 13px; color: var(--text-dim);">در حال جستجوی تشابه وکتوری در pgvector...</div>';
+
+  try {
+    const res = await fetch(`${API_BASE}/brain/search?query=${encodeURIComponent(query)}&project_id=${state.currentProjectId || ''}`);
+    if (res.ok) {
+      const results = await res.json();
+      if (!results.length) {
+        resultsDiv.innerHTML = '<div class="empty-state">موردی با تشابه معنایی یافت نشد.</div>';
+        return;
+      }
+      resultsDiv.innerHTML = results.map((r, i) => `
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 14px; margin-top: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <strong style="color: var(--accent-cyan); font-size: 13px;">نتیجه #${i+1} — تشابه کسینوسی: ${(r.score * 100).toFixed(1)}%</strong>
+            <span class="badge badge-primary">${r.metadata?.doc_type || 'Knowledge'}</span>
+          </div>
+          <div style="font-size: 13px; line-height: 1.6; color: var(--text-main);">${escapeHtml(r.content)}</div>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    resultsDiv.innerHTML = `<div style="color: var(--accent-rose);">خطا در جستجو: ${err.message}</div>`;
+  }
+}
+
+async function submitIngestDoc(e) {
+  e.preventDefault();
+  const title = document.getElementById('doc-title').value;
+  const document_type = document.getElementById('doc-type').value;
+  const content = document.getElementById('doc-content').value;
+
+  try {
+    const res = await fetch(`${API_BASE}/brain/documents`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        project_id: state.currentProjectId,
+        title,
+        document_type,
+        content
+      })
+    });
+    if (res.ok) {
+      closeModal('modal-ingest-doc');
+      alert('سند با موفقیت چانک‌بندی شده و وکتور امبدینگ آن در دیتابیس ثبت شد.');
+      await loadBrainView();
+    }
+  } catch (err) {
+    alert('خطا در تزریق سند: ' + err.message);
+  }
+}
+
+// -------------------------------------------------------------
+// Agents Hub
+// -------------------------------------------------------------
+const AGENT_META = {
+  'AI COO': { avatar: '👑', color: 'rgba(99, 102, 241, 0.2)', role: 'مغز عملیاتی و ارکستراتور کل', model: 'gpt-4o' },
+  'Business Analyst': { avatar: '📋', color: 'rgba(6, 182, 212, 0.2)', role: 'تحلیل‌گر محصول و معمار مشخصات فنی', model: 'gpt-4o' },
+  'Developer': { avatar: '💻', color: 'rgba(16, 185, 129, 0.2)', role: 'مهندس توسعه نرم‌افزار و مجری کد', model: 'claude-sonnet-4-5' },
+  'QA Engineer': { avatar: '🧪', color: 'rgba(245, 158, 11, 0.2)', role: 'مهندس کیفیت، تست و اعتبارسنجی', model: 'gpt-4o' },
+  'Knowledge Manager': { avatar: '🧠', color: 'rgba(168, 85, 247, 0.2)', role: 'متولی حافظه سازمانی و RAG', model: 'gpt-4o-mini' }
+};
+
+async function loadAgentsView() {
+  try {
+    const res = await fetch(`${API_BASE}/agents`);
+    if (res.ok) {
+      const agents = await res.json();
+      const container = document.getElementById('agents-hub-container');
+      container.innerHTML = agents.map(ag => {
+        const meta = AGENT_META[ag.name] || { avatar: '🤖', color: 'rgba(255,255,255,0.1)', role: ag.type, model: ag.model };
+        const tools = ag.config?.tools || ['brain_search', 'save_memory'];
+        return `
+          <div class="agent-card">
+            <div class="agent-card-header">
+              <div class="agent-avatar" style="background: ${meta.color};">${meta.avatar}</div>
+              <div>
+                <div class="agent-name">${escapeHtml(ag.name)}</div>
+                <div class="agent-role">${escapeHtml(meta.role)}</div>
+              </div>
+            </div>
+            <div class="agent-desc">${escapeHtml(ag.description || '-')}</div>
+            <div style="font-size: 11px; color: var(--text-dim); display: flex; justify-content: space-between;">
+              <span>مدل: <strong style="color: var(--text-main);">${ag.model}</strong></span>
+              <span class="badge badge-success">فعال</span>
+            </div>
+            <div class="agent-tags">
+              ${tools.map(t => `<span class="agent-tag">🔧 ${t}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  } catch (err) {
+    console.error('Failed to load agents view:', err);
+  }
+}
+
+// -------------------------------------------------------------
+// Request Creation
+// -------------------------------------------------------------
+async function submitNewRequest(e) {
+  e.preventDefault();
+  if (!state.currentProjectId) {
+    alert('لطفاً ابتدا یک پروژه ایجاد یا انتخاب کنید.');
+    return;
+  }
+
+  const title = document.getElementById('req-title').value;
+  const description = document.getElementById('req-desc').value;
+  const request_type = document.getElementById('req-type').value;
+  const priority = parseInt(document.getElementById('req-priority').value, 10);
+  const auto_start_workflow = document.getElementById('req-auto-start').checked;
+
+  try {
+    const res = await fetch(`${API_BASE}/requests`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        project_id: state.currentProjectId,
+        title,
+        description,
+        request_type,
+        priority,
+        auto_start_workflow
+      })
+    });
+    if (res.ok) {
+      const created = await res.json();
+      closeModal('modal-new-request');
+      await refreshCurrentView();
+      switchTab('workflows');
+    }
+  } catch (err) {
+    alert('خطا در ثبت درخواست: ' + err.message);
+  }
+}
+
+// -------------------------------------------------------------
+// Step Details & Modal Utilities
+// -------------------------------------------------------------
+function openStepDetail(stepName) {
+  const step = PIPELINE_STEPS.find(s => s.name === stepName);
+  if (!step) return;
+
+  document.getElementById('step-modal-title').textContent = `${step.icon} ${step.label} (${step.agent})`;
+  
+  let contentHtml = `
+    <div style="font-size: 13px; line-height: 1.8;">
+      <p style="margin-bottom: 10px;"><strong>عامل اجرایی:</strong> <span style="color: var(--accent-cyan);">${step.agent}</span></p>
+      <p style="margin-bottom: 10px; color: var(--text-muted);">این مرحله وظیفه اجرای تسک‌های تخصصی، تعامل با ابزارها و ذخیره دستاوردهای فنی در پایگاه‌داده را بر عهده دارد.</p>
+    </div>
+  `;
+
+  if (state.currentWorkflowRun && state.currentWorkflowRun.agent_runs) {
+    const relatedRun = state.currentWorkflowRun.agent_runs.find(ar => ar.agent && (ar.agent.type === step.agent || ar.agent.name === step.agent));
+    if (relatedRun) {
+      contentHtml += `
+        <div style="margin-top: 14px;">
+          <strong style="font-size: 13px;">خروجی داده‌ای تولیدشده:</strong>
+          <div class="code-block" style="margin-top: 6px;">${escapeHtml(JSON.stringify(relatedRun.output, null, 2))}</div>
+        </div>
+      `;
+    }
+  }
+
+  document.getElementById('step-modal-content').innerHTML = contentHtml;
+  openModal('modal-step-detail');
+}
+
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('active');
+}
+
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('active');
+}
+
+function openNewRequestModal() { openModal('modal-new-request'); }
+function openNewProjectModal() { openModal('modal-new-project'); }
+function openIngestModal() { openModal('modal-ingest-doc'); }
+
+function getStatusBadge(status) {
+  switch (status) {
+    case 'COMPLETED':
+    case 'DONE':
+      return '<span class="badge badge-success">تکمیل شد</span>';
+    case 'IN_PROGRESS':
+    case 'RUNNING':
+      return '<span class="badge badge-info">در حال اجرا</span>';
+    case 'WAITING_APPROVAL':
+    case 'REVIEW':
+      return '<span class="badge badge-warning">منتظر تایید</span>';
+    case 'FAILED':
+      return '<span class="badge badge-danger">ناموفق</span>';
+    default:
+      return `<span class="badge badge-primary">${status}</span>`;
+  }
+}
+
+function escapeHtml(text) {
+  if (typeof text !== 'string') return String(text || '');
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+</script>
+
+</body>
+</html>

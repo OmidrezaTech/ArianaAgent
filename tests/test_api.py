@@ -4,7 +4,13 @@ from src.api.main import app, init_db_and_seed
 
 
 @pytest.mark.asyncio
-async def test_health_endpoint():
+async def test_frontend_dashboard_endpoint():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        res = await ac.get("/")
+        assert res.status_code == 200
+        assert "AI Company" in res.text
+        assert "سیستم ارکستراسیون ۵ Agent" in res.text
+
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         res = await ac.get("/health")
         assert res.status_code == 200

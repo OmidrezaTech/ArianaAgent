@@ -1,7 +1,9 @@
+from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from src.core.config import settings
 from src.core.logging import configure_logging, logger
@@ -21,6 +23,7 @@ from src.api.routes import (
 )
 
 configure_logging()
+
 
 
 async def init_db_and_seed():
@@ -169,3 +172,17 @@ app.include_router(workflows.router, prefix=settings.API_V1_STR)
 app.include_router(approvals.router, prefix=settings.API_V1_STR)
 app.include_router(agents.router, prefix=settings.API_V1_STR)
 app.include_router(brain.router, prefix=settings.API_V1_STR)
+
+# Serve Frontend SPA
+static_dir = Path(__file__).parent / "static"
+if static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+    @app.get("/", response_class=HTMLResponse)
+    @app.get("/dashboard", response_class=HTMLResponse)
+    async def serve_dashboard():
+        index_file = static_dir / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file)
+        return HTMLResponse("<h1>AI Company Dashboard</h1>")
+

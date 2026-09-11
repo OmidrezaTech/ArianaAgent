@@ -1,114 +1,182 @@
-# 🚀 AI Company MVP — 5-Agent Autonomous Software Organization
+# 🚀 سازمان هوش مصنوعی (AI Company MVP) — سیستم ۵ Agent خودکار
 
-A production-grade, modular monolith AI organization framework built with **FastAPI**, **SQLAlchemy 2.0**, **PostgreSQL 15+ with pgvector**, and **Pydantic v2**.
-
----
-
-## 🌟 Core Features
-
-- **22 PostgreSQL Tables in 6 Groups**: Complete schema with strict foreign keys, indexes, triggers, and native `pgvector` embedding storage (1536 dims).
-- **5 Specialized Autonomous Agents**:
-  1. `AI COO`: Operational orchestrator & workflow planner
-  2. `Business Analyst`: Requirement engineer & acceptance criteria synthesizer
-  3. `Developer`: Code author, git committer, test builder
-  4. `QA Engineer`: Automated test executor, coverage verifier, bug reporter
-  5. `Knowledge Manager`: Company Brain curator & memory synthesizer
-- **Workflow Engine & State Machine**:
-  - Asynchronous step execution
-  - **Human-in-the-Loop gates** (`REQUIREMENT_APPROVAL`, `FINAL_APPROVAL`)
-  - Automated defect repair loops (`FIX_LOOP` triggered on QA failures)
-  - Token tracking, execution timing, and cost calculation per step
-- **Company Brain (RAG + Memory + Decisions)**:
-  - Vector cosine similarity search (`pgvector` / in-memory fallback)
-  - Episodic & semantic agent memories with importance rating
-  - Structured architectural decision records (ADRs)
-- **Tool Sandbox**:
-  - `FileTools`: Sandboxed workspace read, write, edit, and tree analysis
-  - `GitTools`: Automated commit, branch, diff, and repository management
-  - `TestTools`: Pytest execution and coverage calculation
-- **Multi-Provider LLM Abstraction**:
-  - OpenAI API (`gpt-4o`, `text-embedding-3-small`)
-  - Anthropic API (`claude-sonnet-4-5`)
-  - Deterministic high-fidelity local simulator for offline development & testing
+سیستم پیشرفته ارکستراسیون و مدیریت ۵ عامل هوش مصنوعی (Agent) خودگردان با معماری ماژولار مونولیت (**Modular Monolith**)، طراحی تمیز (**Clean Architecture**)، کنترل گیت‌های انسانی (**Human-in-the-Loop**) و پایگاه داده **PostgreSQL 15+ به همراه افزونه pgvector** و پایتون و **FastAPI**.
 
 ---
 
-## 📁 Project Structure
+## 📋 فهرست مطالب
+
+- [🎯 فلسفه و معماری سیستم](#-فلسفه-و-معماری-سیستم)
+- [🤖 معرفی ۵ Agent تخصصی](#-معرفی-۵-agent-تخصصی)
+- [🗄️ ساختار پایگاه‌داده (۲۲ جدول در ۶ گروه)](#️-ساختار-پایگاهداده-۲۲-جدول-در-۶-گروه)
+- [🔁 جریان کامل اجرای یک درخواست (End-to-End Flow)](#-جریان-کامل-اجرای-یک-درخواست-end-to-end-flow)
+- [💻 وب‌اپلیکیشن و پنل کاربری فرانت‌اند](#-وباپلیکیشن-و-پنل-کاربری-فرانتاند)
+- [⚡ راهنمای نصب و راه‌اندازی سریع](#-راهنمای-نصب-و-راهاندازی-سریع)
+- [🐳 راه‌اندازی با Docker Compose](#-راهاندازی-با-docker-compose)
+- [🧪 اجرای تست‌ها (Pytest)](#-اجرای-تستها-pytest)
+- [🛠️ رفع خطای اتصال به دیتابیس (ConnectionRefusedError)](#️-رفع-خطای-اتصال-به-دیتابیس-connectionrefusederror)
+
+---
+
+## 🎯 فلسفه و معماری سیستم
 
 ```text
-├── pyproject.toml              # Python project metadata & dependencies
-├── Dockerfile                  # Container build instructions
-├── docker-compose.yml          # PostgreSQL (pgvector) + Redis + API
-├── .env.example                # Environment variables template
-├── scripts/
-│   ├── init_postgres.sql       # Pure PostgreSQL DDL & seeds
-│   ├── setup_db.py             # Database table creation & seed loader
-│   └── run_demo.py             # Interactive end-to-end multi-agent execution demo
-├── src/
-│   ├── core/                   # Config, logging, domain exceptions
-│   ├── domain/
-│   │   ├── schemas/            # Pydantic v2 validation contracts
-│   │   ├── agents/             # 5 Agent implementations & Registry
-│   │   └── workflows/          # Orchestration engine & state machine
-│   ├── infrastructure/
-│   │   ├── database/           # 22 SQLAlchemy 2.0 models & repositories
-│   │   ├── llm/                # LLM client & structured prompt templates
-│   │   ├── tools/              # File, Git, and Pytest tools
-│   │   └── brain/              # Vector search, RAG, and memory service
-│   ├── application/            # Business use cases & facades
-│   └── api/                    # FastAPI routers, middleware, dependencies
-└── tests/                      # Full pytest test suite
+┌─────────────────────────────────────────────────────────┐
+│                   کاربر انسانی (Human)                  │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│                    API Layer (FastAPI)                   │
+│  روترهای REST + اعتبارسنجی ورودی/خروجی با Pydantic v2   │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│              Application Layer (Use Cases)               │
+│  ProjectService, RequestService, WorkflowService,        │
+│  ApprovalService, BrainService                           │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│                 Domain Layer (Core Logic)                │
+│  موتور گردش کار (Workflow Engine)، ۵ Agent، رجیستری     │
+└────────────────────┬────────────────────────────────────┘
+                     │
+┌────────────────────▼────────────────────────────────────┐
+│              Infrastructure Layer (External)             │
+│  PostgreSQL (pgvector), ابزارهای Git/FS/Pytest, LLM     │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ⚡ Quick Start
+## 🤖 معرفی ۵ Agent تخصصی
 
-### 1. Installation
+| ردیف | نام Agent | مدل پیشنهادی | نقش و مسئولیت اصلی | ابزارهای در دسترس |
+|:---:|---|---|---|---|
+| ۱ | **AI COO** | `gpt-4o` | **مغز عملیاتی و ارکستراتور:** تجزیه درخواست‌ها، برآورد پیچیدگی و برنامه‌ریزی مراحل گردش کار | `workflow_planner`, `save_memory` |
+| ۲ | **Business Analyst** | `gpt-4o` | **تحلیل‌گر محصول و معمار نیازمندی‌ها:** تولید الزامات فنی، قوانین بیزنس و معیارهای پذیرش (Given-When-Then) | `brain_search`, `save_memory` |
+| ۳ | **Developer** | `claude-sonnet-4-5` | **مهندس توسعه کد:** تولید کدهای ماژولار، ایجاد فایل‌ها، ساخت سوییت تست خودکار و ثبت کامیت‌های Git | `read_file`, `write_file`, `edit_file`, `git_commit` |
+| ۴ | **QA Engineer** | `gpt-4o` | **مهندس تضمین کیفیت و تست:** اجرای خودکار Pytest، محاسبه درصد Coverage، تطابق با الزامات و گزارش باگ‌ها | `run_tests`, `get_coverage`, `create_bug` |
+| ۵ | **Knowledge Manager** | `gpt-4o-mini` | **مدیر حافظه و دانش سازمانی:** ایندکس‌گذاری اسناد، جستجوی برداری معنایی (RAG) و استخراج درس‌های آموخته‌شده | `embed_text`, `vector_search`, `save_memory` |
+
+---
+
+## 🗄️ ساختار پایگاه‌داده (۲۲ جدول در ۶ گروه)
+
+| گروه | جدول‌ها | توضیحات |
+|---|---|---|
+| **Core** | `users`, `projects`, `project_members`, `requests`, `requirements`, `tasks` | کاربران، پروژه‌ها، اعضا، درخواست‌های محصول، مشخصات و تسک‌ها |
+| **Agent / Workflow** | `agents`, `workflows`, `workflow_runs`, `agent_runs` | تنظیمات Agentها، تعاریف پایپ‌لاین، سوابق اجرا و توکن/هزینه |
+| **Development** | `repositories`, `branches`, `commits`, `test_runs`, `bugs` | مخازن کد، شاخه‌ها، کامیت‌های هوش مصنوعی، نتایج تست و باگ‌ها |
+| **Company Brain** | `knowledge_documents`, `knowledge_chunks`, `decisions`, `memories` | اسناد دانش سازمانی، چانک‌های وکتور (pgvector)، تصمیمات ADR و حافظه Agentها |
+| **Control** | `approvals`, `tool_executions`, `audit_logs` | تاییدیه‌های انسانی (Human-in-the-Loop)، لاگ اجرای ابزارها و ممیزی |
+| **Extensions** | `pgvector`, `uuid-ossp`, `pgcrypto` | اکستنشن‌های سرور PostgreSQL برای ذخیره وکتورهای ۱۵۳۶ بعدی |
+
+---
+
+## 🔁 جریان کامل اجرای یک درخواست (End-to-End Flow)
+
+```text
+1. ثبت درخواست جدید (POST /api/requests)
+   ↓
+2. تحلیل و برنامه‌ریزی اولیه توسط AI COO
+   ↓
+3. تدوین مشخصات فنی و معیارهای پذیرش توسط Business Analyst
+   ↓
+4. 🛑 گیت تایید انسانی ۱ (REQUIREMENT_APPROVAL):
+   وضعیت Workflow به WAITING_APPROVAL تغییر کرده و سیستم منتظر تایید شما می‌ماند.
+   (تایید از طریق پنل کاربری یا اندپوینت POST /api/approvals/{id}/action)
+   ↓
+5. پیاده‌سازی کد، ساخت تست‌ها و ثبت Git Commit توسط Developer Agent
+   ↓
+6. اجرای خودکار تست‌های Pytest و ارزیابی کیفیت توسط QA Agent
+   (در صورت رد شدن تست‌ها، حلقه خودکار FIX_LOOP فعال می‌شود)
+   ↓
+7. 🛑 گیت تایید انسانی ۲ (FINAL_APPROVAL):
+   بررسی گزارش تست‌ها و تایید نهایی برای انتشار
+   ↓
+8. استخراج الگوها و ثبت درس‌های آموخته‌شده در Company Brain توسط Knowledge Manager
+   ↓
+9. پایان موفق فرآیند (وضعیت COMPLETED)
+```
+
+---
+
+## 💻 وب‌اپلیکیشن و پنل کاربری فرانت‌اند
+
+داشبورد تک‌صفحه‌ای (SPA) پیشرفته با تم دارک و پشتیبانی کامل از زبان فارسی به‌طور مستقیم روی سرور بالا می‌آید:
+
+- **مشاهده زنده پایپ‌لاین:** ردیابی انیمیشنی هر یک از ۶ گام اجرایی
+- **مرکز تاییدیه‌های انسانی:** مشاهده درخواست‌های در انتظار تایید، ثبت کامنت و دکمه‌های تایید (Approve) یا رد (Reject)
+- **جستجوی معنایی در Brain:** تست و جستجوی وکتوری بر اساس تشابه معنایی
+- **شناسنامه ۵ Agent:** بررسی پرامپت‌ها، ابزارها و وضعیت عملکرد هر عامل
+
+---
+
+## ⚡ راهنمای نصب و راه‌اندازی سریع
+
+### ۱. نصب وابستگی‌ها
 ```bash
-# Clone the repository and install dependencies
+# نصب پکیج و وابستگی‌ها در حالت Editable
 pip install -e .
 ```
 
-### 2. Run Interactive End-to-End Demo
-Run the complete 5-agent pipeline demonstrating knowledge ingestion, project creation, request planning, human approval gating, code generation, automated testing, and final signoff:
-
+### ۲. اجرای دموی کامل و زنده سیستم:
 ```bash
 python3 scripts/run_demo.py
 ```
 
-### 3. Run Test Suite
-```bash
-pytest -v
-```
-
-### 4. Start the FastAPI API Server
+### ۳. اجرای سرور وب و پنل داشبورد:
 ```bash
 uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
 ```
-Interactive API documentation will be available at: `http://localhost:8000/docs`
+- آدرس داشبورد: `http://localhost:8000/`
+- مستندات خودکار Swagger API: `http://localhost:8000/docs`
 
 ---
 
-## 🐳 Running with Docker Compose (PostgreSQL + pgvector)
+## 🐳 راه‌اندازی با Docker Compose
+
+برای اجرای کامل در محیط ایزوله به همراه دیتابیس **PostgreSQL 16 (با پشتیبانی pgvector)** و **Redis**:
 
 ```bash
 docker-compose up --build
 ```
-This launches:
-- **PostgreSQL 16 with pgvector extension** on port `5432` with all 22 tables preloaded from `scripts/init_postgres.sql`.
-- **Redis 7** on port `6379`.
-- **FastAPI Application** on port `8000`.
 
 ---
 
-## 📊 Database Schema (22 Tables)
+## 🧪 اجرای تست‌ها (Pytest)
 
-| Group | Tables |
-|---|---|
-| **Core** | `users`, `projects`, `project_members`, `requests`, `requirements`, `tasks` |
-| **Agent / Workflow** | `agents`, `workflows`, `workflow_runs`, `agent_runs` |
-| **Development** | `repositories`, `branches`, `commits`, `test_runs`, `bugs` |
-| **Company Brain** | `knowledge_documents`, `knowledge_chunks` (vector 1536), `decisions`, `memories` |
-| **Control** | `approvals`, `tool_executions`, `audit_logs` |
-| **Extensions** | `pgvector`, `uuid-ossp`, `pgcrypto` |
+تمام ۱۱ تست یکپارچه (تست مدل‌ها، هر ۵ Agent، موتور Workflow و APIها):
+
+```bash
+pytest -v
+```
+
+---
+
+## 🛠️ رفع خطای اتصال به دیتابیس (ConnectionRefusedError)
+
+اگر هنگام اجرای `pytest` یا برنامه با خطای زیر مواجه شدید:
+```text
+ConnectionRefusedError: [Errno 111] Connect call failed ('127.0.0.1', 5432)
+```
+
+### علت خطا:
+پروژه روی اتصال به **PostgreSQL** در پورت ۵۴۳۲ تنظیم شده است در حالی که سرویس PostgreSQL روی سیستم شما روشن نیست.
+
+### راه‌حل‌ها:
+
+#### راهکار ۱ (ساده‌ترین — استفاده از SQLite محلی و بدون نیاز به نصب هیچ ابزاری):
+فایل `.env` را باز کنید و آدرس دیتابیس را روی SQLite قرار دهید:
+```dotenv
+DATABASE_URL=sqlite+aiosqlite:///./aicompany.db
+SYNC_DATABASE_URL=sqlite:///./aicompany.db
+```
+
+#### راهکار ۲ (اجرای دیتابیس PostgreSQL با Docker):
+کافیست فقط سرویس دیتابیس را با داکر روشن کنید:
+```bash
+docker-compose up -d db
+```
+و سپس دستور `pytest -v` یا `python3 scripts/run_demo.py` را اجرا نمایید.

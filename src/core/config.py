@@ -12,14 +12,14 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "super-secret-jwt-signing-key-for-mvp-company"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 1 day
 
-    # Database
+    # Database Settings (Default: SQLite for zero-config offline tests & dev; Postgres for Docker/Production)
     DATABASE_URL: str = "sqlite+aiosqlite:///./aicompany.db"
     SYNC_DATABASE_URL: str = "sqlite:///./aicompany.db"
 
-    # LLM & AI
+    # LLM & AI Providers (mock, openai, anthropic)
     OPENAI_API_KEY: str = "mock-key"
     ANTHROPIC_API_KEY: str = "mock-key"
-    LLM_PROVIDER: str = "mock"  # mock, openai, anthropic
+    LLM_PROVIDER: str = "mock"
     DEFAULT_FAST_MODEL: str = "gpt-4o-mini"
     DEFAULT_SMART_MODEL: str = "gpt-4o"
     DEFAULT_DEV_MODEL: str = "claude-sonnet-4-5"

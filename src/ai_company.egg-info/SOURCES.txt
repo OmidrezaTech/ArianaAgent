@@ -1,3 +1,4 @@
+README.md
 pyproject.toml
 src/ai_company.egg-info/PKG-INFO
 src/ai_company.egg-info/SOURCES.txt
@@ -54,3 +55,7 @@ src/infrastructure/tools/base.py
 src/infrastructure/tools/file_tools.py
 src/infrastructure/tools/git_tools.py
 src/infrastructure/tools/test_tools.py
+tests/test_agents.py
+tests/test_api.py
+tests/test_models.py
+tests/test_workflow_engine.py
